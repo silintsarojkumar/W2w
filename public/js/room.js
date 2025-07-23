@@ -104,8 +104,8 @@ function displaySyncedVideo(url) {
     iframe.id = 'yt-player';
     sharedVideo.appendChild(iframe);
     new YT.Player('yt-player', {
-
-
+      height: '360',
+      width: '640',
       videoId: id,
       events: {
         'onReady': (event) => {
@@ -128,7 +128,8 @@ function displaySyncedVideo(url) {
     sharedVideo.appendChild(iframe);
     DM.player('dm-player', {
       video: id,
-
+      width: '640',
+      height: '360',
       params: { autoplay: 1 }
     }).then(player => {
       dmPlayer = player;

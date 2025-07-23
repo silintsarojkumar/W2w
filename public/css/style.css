@@ -1,7 +1,13 @@
     body { font-family: sans-serif; }
     video { width: 200px; margin: 5px; border-radius: 10px; }
     #video-grid { display: flex; flex-wrap: wrap; }
-    #shared-video iframe, #shared-video video { margin-top: 10px; width: 640px; height: 360px; }
+    #shared-video > div,
+#shared-video > video {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+}
+
 
     body{
     display: flex;
