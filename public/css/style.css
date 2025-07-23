@@ -87,6 +87,9 @@ a {
     text-decoration: none;
     color: black;
 }
+#my-video{
+    border-radius: 10px;
+}
 .adminDash{
     display: flex !important;
     justify-content: space-around;
@@ -94,4 +97,144 @@ a {
 .fa-regular{
     font-size: 1.5rem;
     font-weight: 400;
+}
+#shared-video {
+  display: flex;
+  justify-content: center;
+  margin: 1rem auto;
+  width: 100%;
+  max-width: 640px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: black;
+}
+
+.responsive-player {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+}
+
+.responsive-player iframe,
+.responsive-player > div,
+.responsive-player video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+@media (max-width: 576px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  #navbar {
+    padding: 1rem;
+  }
+
+  .input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #video-form .form-control,
+  #video-form .btn,
+  #video-form .input-group-text {
+    width: 100%;
+  }
+
+.uservideo{
+    display: flex;
+    flex-direction: row;
+
+}
+
+  #room-url,
+  #copy-link,
+  #switch-camera {
+    width: 100%;
+  }
+
+.text-center,.uservideo{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+
+
+  #shared-video {
+    width: 100% !important;
+    height: auto !important;
+    padding: 0 1rem;
+  }
+
+  .responsive-player {
+    padding-top: 56.25%;
+  }
+
+  .responsive-player iframe,
+  .responsive-player > div {
+    height: 100% !important;
+  }
+    .f-info-socal {
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .f-info-link {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+    #navbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  #video-form .input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #video-form .form-control,
+  #video-form .input-group-text,
+  #video-form .btn {
+    width: 100%;
+  }
+
+
+
+  #room-url,
+  #copy-link,
+  #switch-camera {
+    width: 100%;
+  }
+
+  #shared-video {
+    padding: 0.5rem;
+  }
+ .link{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+ }
+  #basic-addon1{
+    display: none;
+  }
+}
+
+/* Utility */
+a {
+  text-decoration: none;
+  color: black;
+}
+
+.nav-link {
+  color: #0e0c0c !important;
 }

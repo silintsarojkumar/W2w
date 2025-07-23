@@ -1,24 +1,28 @@
-<%layout("/layout/homeBoiler.ejs")%>
-    
-    <div class="home">
-        <a href="/room" class="btn btn-outline-success">Start Room</a>
-        <h1>Welcome to Watch Together</h1>
-        <p>Share videos with friends in real-time.</p>
-        <p>To create a room, click the "<a href="/room">Start Room</a>".</p>
-        <p>
-Your Private Watch Party Awaits! 🎉
+<% layout("/layout/homeBoiler.ejs") %>
 
-Tired of trying to press "play" at the same time? Now you don't have to.
+<div class="home text-center p-4">
+    <h1 class="mb-4">Welcome to Watch Together</h1>
+    <a href="/room" class="btn btn-outline-success mb-3">Start Room</a>
 
-This is your personal space to watch YouTube and Dailymotion videos with friends, family, or anyone you choose. Every room is completely private and accessible only through your unique link.
+    <p>Share videos with friends in real-time.</p>
+    <p>
+        To create a room, click 
+        <a href="/room">Start Room</a>.
+    </p>
 
-How it works:
+    <p class="mt-4">
+        <strong>Your Private Watch Party Awaits! 🎉</strong><br><br>
+        Tired of trying to press "play" at the same time? Now you don't have to.<br><br>
 
-Create a Room: Start your own private session with one click.
+        This is your personal space to watch <strong>YouTube</strong> and <strong>Dailymotion</strong> videos 
+        with friends, family, or anyone you choose. Every room is completely private and accessible only through your unique link.
+    </p>
 
-Share the Link: Send the unique room link to your friends.
+    <ul class="text-start d-inline-block">
+        <li><strong>Create a Room:</strong> Start your own private session with one click.</li>
+        <li><strong>Share the Link:</strong> Send the unique room link to your friends.</li>
+        <li><strong>Watch Together:</strong> Paste a video link and enjoy watching in sync!</li>
+    </ul>
 
-Watch Together: Paste a video link and enjoy watching in sync!
-
-Ready to start? Create your room now!.</p>
-    </div>
+    <p class="mt-3">Ready to start? <a href="/room">Create your room now!</a></p>
+</div>

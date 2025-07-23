@@ -1,21 +1,19 @@
-<%layout("/layout/boiler.ejs")%>
+<% layout("/layout/boiler.ejs") %>
 
-
-<!-- Copy Room Link -->
-
-
-<!-- Switch Camera -->
+<div class="container py-3">
 
 
 
+  <!-- Shared Video -->
+  <div id="shared-video" class="ytStream card offset-3" style="height: 360px; width: 520px;"></div>
 
-
-  <div id="shared-video" class="ytStream card"></div>
-
-  <div ><video id="my-video" autoplay muted></video></div>
-  
-  <div class="videos">
-    <div id="video-grid"></div>
+  <!-- My Video -->
+  <div class="mb-4 text-center">
+    <video id="my-video" autoplay muted class="border rounded" style="height: 170px;"></video>
   </div>
-</body>
-</html>
+
+  <!-- All Participants -->
+<div class="uservideo row row-cal-3"><div class="videos" id="video-grid"style=" height: 170px;"></div>
+    <!-- Other video streams will be dynamically added here -->
+  </div>
+</div>

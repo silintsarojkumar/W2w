@@ -7,8 +7,8 @@ const sharedVideo = document.getElementById('shared-video');
 
 let useFrontCamera = true;
 let currentStream;
-const peerCalls = {}; // Track PeerJS calls
-const connectedUsers = new Set(); // Track connected users
+const peerCalls = {};
+const connectedUsers = new Set();
 
 let ytPlayer = null;
 let dmPlayer = null;
@@ -18,7 +18,6 @@ let suppressEmit = false;
 myVideo.muted = true;
 const peer = new Peer();
 
-// Start camera and mic
 navigator.mediaDevices.getUserMedia({
   video: { facingMode: "user" },
   audio: true
@@ -31,26 +30,23 @@ navigator.mediaDevices.getUserMedia({
   peer.on('call', call => {
     call.answer(currentStream);
     const video = document.createElement('video');
-
+    video.setAttribute('playsinline', true);
     call.on('stream', userVideoStream => {
       video.srcObject = userVideoStream;
       video.addEventListener('loadedmetadata', () => video.play());
       videoGrid.append(video);
     });
-
-    call.on('close', () => {
-      video.remove();
-    });
-
+    call.on('close', () => video.remove());
     peerCalls[call.peer] = call;
   });
 
   socket.on('user-connected', userId => {
-    if (connectedUsers.has(userId)) return;
-    connectedUsers.add(userId);
-    connectToNewUser(userId, currentStream);
+    if (!connectedUsers.has(userId)) {
+      connectedUsers.add(userId);
+      connectToNewUser(userId, currentStream);
+    }
   });
-});
+}).catch(err => console.error('Media access error:', err));
 
 peer.on('open', id => {
   const roomId = window.location.pathname.split('/')[2];
@@ -60,6 +56,7 @@ peer.on('open', id => {
 function connectToNewUser(userId, stream) {
   const call = peer.call(userId, stream);
   const video = document.createElement('video');
+  video.setAttribute('playsinline', true);
 
   call.on('stream', userVideoStream => {
     video.srcObject = userVideoStream;
@@ -67,19 +64,19 @@ function connectToNewUser(userId, stream) {
     videoGrid.append(video);
   });
 
-  call.on('close', () => {
-    video.remove();
-  });
-
+  call.on('close', () => video.remove());
   peerCalls[userId] = call;
 }
 
 videoForm.addEventListener('submit', e => {
   e.preventDefault();
-  const url = videoUrlInput.value;
-  socket.emit('video-url', url);
-  displaySyncedVideo(url);
+  const url = videoUrlInput.value.trim();
+  if (url) {
+    socket.emit('video-url', url);
+    displaySyncedVideo(url);
+  }
 });
+
 
 socket.on('video-url', url => {
   videoUrlInput.value = url;
@@ -88,24 +85,25 @@ socket.on('video-url', url => {
 
 function displaySyncedVideo(url) {
   sharedVideo.innerHTML = '';
-  ytPlayer = null;
-  dmPlayer = null;
-  activePlayer = null;
+  ytPlayer = dmPlayer = activePlayer = null;
 
   if (url.includes('youtube.com') || url.includes('youtu.be')) {
-    let id = null;
-    if (url.includes('youtube.com')) {
-      const urlParams = new URLSearchParams(url.split('?')[1]);
-      id = urlParams.get('v');
-    } else if (url.includes('youtu.be')) {
-      id = url.split('youtu.be/')[1].split('?')[0];
-    }
-    const iframe = document.createElement('div');
-    iframe.id = 'yt-player';
-    sharedVideo.appendChild(iframe);
+    const id = url.includes('youtube.com')
+      ? new URLSearchParams(url.split('?')[1]).get('v')
+      : url.split('youtu.be/')[1].split('?')[0];
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'responsive-player';
+
+    const playerDiv = document.createElement('div');
+    playerDiv.id = 'yt-player';
+
+    wrapper.appendChild(playerDiv);
+    sharedVideo.appendChild(wrapper);
+
     new YT.Player('yt-player', {
-      height: '360',
-      width: '640',
+      height: 'auto',
+      width: 'auto',
       videoId: id,
       events: {
         'onReady': (event) => {
@@ -113,54 +111,76 @@ function displaySyncedVideo(url) {
         },
         'onStateChange': (event) => {
           if (suppressEmit) return;
+          const time = event.target.getCurrentTime();
           if (event.data === YT.PlayerState.PLAYING) {
-            socket.emit('video-control', { action: 'play', currentTime: event.target.getCurrentTime() });
+            socket.emit('video-control', { action: 'play', currentTime: time });
           } else if (event.data === YT.PlayerState.PAUSED) {
-            socket.emit('video-control', { action: 'pause', currentTime: event.target.getCurrentTime() });
+            socket.emit('video-control', { action: 'pause', currentTime: time });
           }
         }
       }
     });
+
   } else if (url.includes('dailymotion.com')) {
     const id = url.split('/video/')[1]?.split('_')[0];
-    const iframe = document.createElement('div');
-    iframe.id = 'dm-player';
-    sharedVideo.appendChild(iframe);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'responsive-player';
+
+    const dmDiv = document.createElement('div');
+    dmDiv.id = 'dm-player';
+
+    wrapper.appendChild(dmDiv);
+    sharedVideo.appendChild(wrapper);
+
     DM.player('dm-player', {
       video: id,
-      width: '640',
-      height: '360',
+      width: 'auto',
+      height: 'auto',
       params: { autoplay: 1 }
     }).then(player => {
-      dmPlayer = player;
-      activePlayer = player;
+      dmPlayer = activePlayer = player;
       player.addEventListener('play', () => {
-        if (!suppressEmit) player.currentTime.then(t => {
-          socket.emit('video-control', { action: 'play', currentTime: t });
-        });
+        if (!suppressEmit) {
+          player.currentTime.then(t => {
+            socket.emit('video-control', { action: 'play', currentTime: t });
+          });
+        }
       });
       player.addEventListener('pause', () => {
-        if (!suppressEmit) player.currentTime.then(t => {
-          socket.emit('video-control', { action: 'pause', currentTime: t });
-        });
+        if (!suppressEmit) {
+          player.currentTime.then(t => {
+            socket.emit('video-control', { action: 'pause', currentTime: t });
+          });
+        }
       });
     });
+
   } else {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'responsive-player';
+
     const video = document.createElement('video');
     video.src = url;
     video.controls = true;
     video.autoplay = true;
-    video.style.width = '640px';
-    video.style.height = '360px';
-    sharedVideo.appendChild(video);
+    video.style.width = 'auto';
+    video.style.height = 'auto';
+    video.setAttribute('playsinline', true);
+
+    wrapper.appendChild(video);
+    sharedVideo.appendChild(wrapper);
+
     activePlayer = video;
 
     video.addEventListener('play', () => {
-      if (!suppressEmit) socket.emit('video-control', { action: 'play', currentTime: video.currentTime });
+      if (!suppressEmit)
+        socket.emit('video-control', { action: 'play', currentTime: video.currentTime });
     });
 
     video.addEventListener('pause', () => {
-      if (!suppressEmit) socket.emit('video-control', { action: 'pause', currentTime: video.currentTime });
+      if (!suppressEmit)
+        socket.emit('video-control', { action: 'pause', currentTime: video.currentTime });
     });
   }
 }
@@ -195,28 +215,31 @@ document.getElementById('switch-camera').addEventListener('click', async () => {
 
   try {
     const newStream = await navigator.mediaDevices.getUserMedia(constraints);
-
     currentStream.getTracks().forEach(track => track.stop());
     currentStream = newStream;
-
     myVideo.srcObject = newStream;
     await myVideo.play();
 
-    // Reconnect all peers with new stream
     for (const userId of connectedUsers) {
       if (peerCalls[userId]) peerCalls[userId].close();
       connectToNewUser(userId, currentStream);
     }
-
   } catch (err) {
     console.error('Error switching camera:', err);
   }
 });
 
 document.getElementById('copy-link').addEventListener('click', () => {
-  const input = document.getElementById('room-url');
-  input.select();
-  input.setSelectionRange(0, 99999);
-  document.execCommand('copy');
-  alert('Room link copied!');
+  const roomUrl = window.location.href;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(roomUrl).then(() => alert('Room link copied!'));
+  } else {
+    const input = document.createElement('input');
+    document.body.appendChild(input);
+    input.value = roomUrl;
+    input.select();
+    document.execCommand('copy');
+    document.body.removeChild(input);
+    alert('Room link copied!');
+  }
 });
