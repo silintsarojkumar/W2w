@@ -1,0 +1,20 @@
+<nav class="navbar bg-body-tertiary id="navbar">
+  <div class="container-fluid">
+    <form class="container-fluid" id="video-form">
+    <div class="input-group">
+      <a class="navbar-brand" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">W2w</a>
+      <span class="input-group-text" id="basic-addon1">@</span>
+      <input class="form-control" type="text" id="video-url" placeholder="Paste YouTube, Dailymotion or MP4 link"/>
+      <button class="btn btn-outline-success" type="submit">Watch Together</button>
+    </div>
+  </form>
+
+<div class="col-3 offset-5" style="margin-top: 10px;">
+  <input type="text" id="room-url" value="<%= `https://yourdomain.com/room/${roomId}` %>" readonly style="width: 400px; display: none;" />
+  <button id="copy-link" class="btn btn-outline-primary">Shear Room</button>
+  <button id="switch-camera" class="btn btn-outline-success">Switch Camera</button>
+</div>
+
+  </div>
+</nav>
+
